@@ -1,0 +1,14 @@
+eclipse.preferences.version=1
+encoding//src/Connection/MySQLConnUtils.java=UTF-8
+encoding//src/gui/ChangePassword.java=UTF-8
+encoding//src/gui/Main.java=UTF-8
+encoding//src/gui/ManageAccount.java=UTF-8
+encoding//src/gui/ManageNV.java=UTF-8
+encoding//src/gui/ManageSP.java=UTF-8
+encoding//src/gui/PanelManage.java=UTF-8
+encoding//src/gui/PanelOrder.java=UTF-8
+encoding//src/gui/PanelStatistical.java=UTF-8
+encoding//src/login/Login.java=UTF-8
+encoding//src/test/TestAccountsAPI.java=UTF-8
+encoding//src/test/TestProductsAPI.java=UTF-8
+encoding//src/test/TestStaffsAPI.java=UTF-8
