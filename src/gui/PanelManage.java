@@ -62,14 +62,14 @@ public class PanelManage extends JPanel {
 	 * Create the panel.
 	 */
 	public PanelManage() {
-		setBounds(0, 78, 1395, 875);
+		setBounds(0, 0, 1902, 905);
 		setBackground(new Color(238, 207, 161));
 		setLayout(null);
 		
 		JPanel panel = new JPanel();
 		panel.setForeground(Color.BLACK);
 		panel.setBackground(new Color(0, 0, 0, 200));
-		panel.setBounds(0, 0, 1395, 875);
+		panel.setBounds(0, 0, 1902, 905);
 		add(panel);
 		panel.setLayout(null);
 		
@@ -115,24 +115,8 @@ public class PanelManage extends JPanel {
 		btnManageAccount.setBounds(543, 522, 308, 128);
 		panel.add(btnManageAccount);
 		
-		JButton btnChangeP = new JButton("Đổi mật khẩu");
-		btnChangeP.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				ChangePassword cP = new ChangePassword();
-				cP.setLocationRelativeTo(null);
-				cP.setVisible(true);
-			}
-		});
-		btnChangeP.setForeground(Color.BLACK);
-		btnChangeP.setIcon(new ImageIcon(PanelManage.class.getResource("/images/lock.png")));
-		btnChangeP.setFont(new Font("Tahoma", Font.PLAIN, 21));
-		btnChangeP.setBounds(1147, 0, 248, 78);
-		btnChangeP.setBackground(Color.WHITE);
-		btnChangeP.setBorder(null);
-		panel.add(btnChangeP);
-		
 		JLabel label = new JLabel("");
-		label.setBounds(0, 0, 1395, 875);
+		label.setBounds(0, 0, 1902, 905);
 		add(label);
 		label.setIcon(new ImageIcon(PanelManage.class.getResource("/images/bgcoffee2.jpg")));
 		

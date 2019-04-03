@@ -46,6 +46,17 @@ public class TestAccountsAPI {
 		System.out.println(account.getPassword());
 		return account;
 	}
+	public Account testGetAccountByUsername(String username) {
+		Account account = client.target(REST_SERVICE_URL).path("/{username}").resolveTemplate("username", username)
+				.request("application/json").get(Account.class);
+		String result = FAIL;
+		if (account != null) {
+			result = PASS;
+		}
+		//System.out.println("Test case name: testGetAccountByUsername, Result: " + account.getUsername());
+		//System.out.println(account.getPassword());
+		return account;
+	}
 	public String testInsertAccount(String username, String password, String role) {
 		Form form = new Form();
 		form.param("username", username);
@@ -89,17 +100,6 @@ public class TestAccountsAPI {
 
 		System.out.println("Test case name: testDeleteAccount, Result: " + result);
 		return result;
-	}
-	public Account testGetAccountByUsername(String username) {
-		Account account = client.target(REST_SERVICE_URL).path("/{username}").resolveTemplate("username", username)
-				.request("application/json").get(Account.class);
-		String result = FAIL;
-		if (account != null) {
-			result = PASS;
-		}
-		//System.out.println("Test case name: testGetAccountByUsername, Result: " + account.getUsername());
-		//System.out.println(account.getPassword());
-		return account;
 	}
 	
 	public static void main(String[] args) {

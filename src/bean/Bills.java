@@ -7,14 +7,12 @@ public class Bills {
 	private String tableId;
 	private String status;
 	private String createAt;
-	private double total;
 
 	public Bills() {
 		super();
 	}
 
-	public Bills(String id, String staffId, String customerId, String tableId, String status, String createAt,
-			double total) {
+	public Bills(String id, String staffId, String customerId, String tableId, String status, String createAt) {
 		super();
 		this.id = id;
 		this.staffId = staffId;
@@ -22,7 +20,6 @@ public class Bills {
 		this.tableId = tableId;
 		this.status = status;
 		this.createAt = createAt;
-		this.total = total;
 	}
 
 	public String getId() {
@@ -71,14 +68,6 @@ public class Bills {
 
 	public void setCreateAt(String createAt) {
 		this.createAt = createAt;
-	}
-
-	public double getTotal() {
-		return total;
-	}
-
-	public void setTotal(double total) {
-		this.total = total;
 	}
 
 }

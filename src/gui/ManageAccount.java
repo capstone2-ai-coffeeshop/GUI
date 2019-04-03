@@ -21,6 +21,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 
@@ -81,6 +82,16 @@ public class ManageAccount extends JFrame {
 	 * Create the frame.
 	 */
 	public ManageAccount() {
+		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Windows".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.getMessage();
+		}
 		setTitle("Quản Lý Tài Khoản");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1085, 850);
@@ -212,6 +223,12 @@ public class ManageAccount extends JFrame {
 		contentPane.add(btnDelA);
 		
 		tableA = new JTable();
+		tableA.setForeground(Color.BLACK);
+		tableA.setRowHeight(30);
+		tableA.setSelectionBackground(new Color(1, 198, 83));
+		tableA.setSelectionForeground(new Color(255, 255, 255));
+		tableA.setGridColor(new Color(255, 255, 255));
+		tableA.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableA.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {

@@ -6,9 +6,7 @@ public class BillItems {
 	private String productId;
 	private String quantity;
 	private String session;
-	private String time;
 	private String weather;
-	private String unitPrice;
 	private float discount;
 	private String description;
 
@@ -16,17 +14,15 @@ public class BillItems {
 		super();
 	}
 
-	public BillItems(String id, String billId, String productId, String quantity, String session, String time,
-			String weather, String unitPrice, float discount, String description) {
+	public BillItems(String id, String billId, String productId, String quantity, String session, 
+			String weather, float discount, String description) {
 		super();
 		this.id = id;
 		this.billId = billId;
 		this.productId = productId;
 		this.quantity = quantity;
 		this.session = session;
-		this.time = time;
 		this.weather = weather;
-		this.unitPrice = unitPrice;
 		this.discount = discount;
 		this.description = description;
 	}
@@ -71,28 +67,12 @@ public class BillItems {
 		this.session = session;
 	}
 
-	public String getTime() {
-		return time;
-	}
-
-	public void setTime(String time) {
-		this.time = time;
-	}
-
 	public String getWeather() {
 		return weather;
 	}
 
 	public void setWeather(String weather) {
 		this.weather = weather;
-	}
-
-	public String getUnitPrice() {
-		return unitPrice;
-	}
-
-	public void setUnitPrice(String unitPrice) {
-		this.unitPrice = unitPrice;
 	}
 
 	public float getDiscount() {

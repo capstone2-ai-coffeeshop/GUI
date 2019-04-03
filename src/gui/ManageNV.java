@@ -28,6 +28,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
@@ -111,6 +112,16 @@ public class ManageNV extends JFrame {
 	 * Create the frame.
 	 */
 	public ManageNV() {
+		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Windows".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.getMessage();
+		}
 		setTitle("Qu\u1EA3n L\u00FD Nh\u00E2n Vi\u00EAn");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1085, 850);
@@ -320,6 +331,12 @@ public class ManageNV extends JFrame {
 		contentPane.add(scrollPane);
 
 		tableNV = new JTable();
+		tableNV.setForeground(Color.BLACK);
+		tableNV.setRowHeight(30);
+		tableNV.setSelectionBackground(new Color(1, 198, 83));
+		tableNV.setSelectionForeground(new Color(255, 255, 255));
+		tableNV.setGridColor(new Color(255, 255, 255));
+		tableNV.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableNV.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {

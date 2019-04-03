@@ -18,13 +18,13 @@ public class PanelHome extends JPanel {
 		setLayout(null);
 		
 		JPanel panel = new JPanel();
-		panel.setBounds(0, 0, 1395, 875);
+		panel.setBounds(0, 0, 1902, 905);
 		panel.setBackground(new Color(0, 0, 0, 200));
 		add(panel);
 		panel.setLayout(new BorderLayout(0, 0));
 		
 		JLabel label = new JLabel("");
-		label.setBounds(0, 0, 1395, 875);
+		label.setBounds(0, 0, 1902, 905);
 		add(label);
 		label.setIcon(new ImageIcon(PanelHome.class.getResource("/images/bgcoffee3.jpg")));
 

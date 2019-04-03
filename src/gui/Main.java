@@ -27,6 +27,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -38,6 +39,7 @@ import javax.swing.JMenu;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Insets;
+import java.awt.Toolkit;
 
 import javax.swing.JSeparator;
 import javax.swing.JLabel;
@@ -59,6 +61,7 @@ public class Main extends JFrame {
 	private Connection connection;
 	
 	MySQLConnUtils instanceSQL = MySQLConnUtils.getInstance();
+	private JLabel lblNewLabel;
 
 	/**
 	 * Launch the application.
@@ -70,6 +73,7 @@ public class Main extends JFrame {
 					Main frame = new Main();
 					//frame.setExtendedState(JFrame.MAXIMIZED_BOTH); 
 					//frame.setUndecorated(true);
+					//frame.pack();
 					frame.setVisible(true);
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -85,7 +89,7 @@ public class Main extends JFrame {
 					for (;;) {
 						Calendar cal = new GregorianCalendar();
 						int day = cal.get(Calendar.DAY_OF_MONTH);
-						int month = cal.get(Calendar.MONTH);
+						int month = LocalDate.now().getMonthValue();
 						int year = cal.get(Calendar.YEAR);
 						
 						int second = cal.get(Calendar.SECOND);
@@ -110,6 +114,7 @@ public class Main extends JFrame {
 		pnMain.removeAll();
 		pnMain.add(childPanel);
 		pnMain.validate();
+		pnMain.repaint();
 	}
 	
 
@@ -119,7 +124,7 @@ public class Main extends JFrame {
 	public Main() {
 		setTitle("AI Coffee Shop");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		setBounds(10, 10, 1413, 1000);
+		setBounds(0, 0, 1920, 1030);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -127,7 +132,7 @@ public class Main extends JFrame {
         
         JPanel pnMenuBar = new JPanel();
         pnMenuBar.setBackground(new java.awt.Color(205, 179, 139));
-        pnMenuBar.setBounds(0, 0, 1395, 75);
+        pnMenuBar.setBounds(0, 0, 1902, 75);
         contentPane.add(pnMenuBar);
         
         JButton btnHome = new JButton();
@@ -192,7 +197,7 @@ public class Main extends JFrame {
         pnMenuBar.add(btnQuanLy);
         
         JButton btnThoat = new JButton();
-        btnThoat.setBounds(900, 0, 210, 75);
+        btnThoat.setBounds(1160, 0, 210, 75);
         btnThoat.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		//System.exit(0);
@@ -214,7 +219,7 @@ public class Main extends JFrame {
         pnMenuBar.add(btnThoat);
         
         lblClock = new JLabel();
-        lblClock.setBounds(1203, 0, 192, 34);
+        lblClock.setBounds(1710, 0, 192, 34);
         lblClock.setForeground(Color.BLACK);
         lblClock.setFont(new Font("Tahoma", Font.PLAIN, 20));
         pnMenuBar.add(lblClock);
@@ -222,17 +227,38 @@ public class Main extends JFrame {
         lblAccName = new JLabel();
         lblAccName.setForeground(Color.BLACK);
         lblAccName.setFont(new Font("Tahoma", Font.PLAIN, 20));
-        lblAccName.setBounds(1203, 41, 192, 34);
+        lblAccName.setBounds(1732, 41, 170, 34);
         pnMenuBar.add(lblAccName);
+        
+        lblNewLabel = new JLabel("Xin chào, ");
+        lblNewLabel.setForeground(Color.BLACK);
+        lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 20));
+        lblNewLabel.setBounds(1642, 41, 88, 34);
+        pnMenuBar.add(lblNewLabel);
+        
+        JButton btnChangeP = new JButton("Đổi mật khẩu");
+        btnChangeP.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		ChangePassword cP = new ChangePassword();
+				cP.setLocationRelativeTo(null);
+				cP.setVisible(true);
+        	}
+        });
+        btnChangeP.setIcon(new ImageIcon(Main.class.getResource("/images/lock.png")));
+        btnChangeP.setForeground(Color.BLACK);
+        btnChangeP.setFont(new Font("Tahoma", Font.PLAIN, 21));
+        btnChangeP.setBackground(Color.WHITE);
+        btnChangeP.setBounds(900, 0, 248, 75);
+        pnMenuBar.add(btnChangeP);
         
         pnMain = new JPanel();
         pnMain.setBackground(new Color(0, 0, 0, 200));
-        pnMain.setBounds(0, 78, 1395, 875);
+        pnMain.setBounds(0, 78, 1902, 905);
         contentPane.add(pnMain);
         pnMain.setLayout(new BorderLayout(0, 0));
         
         JLabel label = new JLabel("");
-        label.setBounds(0, 78, 1395, 875);
+        label.setBounds(0, 78, 1902, 905);
         contentPane.add(label);
         label.setIcon(new ImageIcon(Main.class.getResource("/images/bgcoffee3.jpg")));
 

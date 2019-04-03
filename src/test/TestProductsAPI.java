@@ -34,6 +34,16 @@ public class TestProductsAPI {
 		//System.out.println("Test case name: testGetAllUsers, Result: " + result);
 		return products;
 	}
+	public Products testGetProduct(String id) {
+		Products product = client.target(REST_SERVICE_URL).path("/{id}").resolveTemplate("id", id)
+				.request("application/json").get(Products.class);
+		String result = FAIL;
+		if (product != null) {
+			result = PASS;
+		}
+		//System.out.println("Test case name: testGetProduct, Result: " + result);
+		return product;
+	}
 	public String testInsertProduct(String name, String categoryID, String unitprice, String description, String status, String createdAt) {
 		Form form = new Form();
 		form.param("name", name);
@@ -86,5 +96,6 @@ public class TestProductsAPI {
 	public static void main(String[] args) {
 		TestProductsAPI test = new TestProductsAPI();
 		test.testGetAllProducts();
+		test.testGetProduct("1");
 	}
 }

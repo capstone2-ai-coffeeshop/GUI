@@ -8,12 +8,18 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 
+import javax.ws.rs.PathParam;
+
 import bean.Account;
 import bean.Products;
 import bean.Staffs;
+import bean.Tables;
+import bean.ProductCategory;
 import test.TestStaffsAPI;
 import test.TestProductsAPI;
 import test.TestAccountsAPI;
+import test.TestTablesAPI;
+import test.TestProductCategorysAPI;
 
  
 public class MySQLConnUtils {
@@ -51,7 +57,7 @@ public class MySQLConnUtils {
 				e.printStackTrace();
 			}
 		}
-		return connection;
+		return connection; //còn web đâu mà rub :)))c
 	}
 
 /////////////////////////////////////////////////////
@@ -76,6 +82,10 @@ public class MySQLConnUtils {
 	public List<Products> getProducts(){
 		TestProductsAPI t = new TestProductsAPI();
 		return t.testGetAllProducts();
+	}
+	public Products getProduct(String id) {
+		TestProductsAPI t = new TestProductsAPI();
+		return t.testGetProduct(id);
 	}
 	public String insertProduct(String name, String categoryID, String unitprice, String description, String status, String createdAt) {
 		TestProductsAPI t = new TestProductsAPI();
@@ -112,6 +122,18 @@ public class MySQLConnUtils {
 		return t.testDeleteAccount(id);
 	}
 	
+/////////////////////////////////////////////////////
+	public List<Tables> getTables() {
+		TestTablesAPI t = new TestTablesAPI();
+		return t.testGetAllTables();
+	}
+	
+/////////////////////////////////////////////////////
+	public List<ProductCategory> getProductCategorys() {
+		TestProductCategorysAPI t = new TestProductCategorysAPI();
+		return t.testGetAllProductCategorys();
+	}
+	
 	public static MySQLConnUtils getInstance() {
 		if (instance == null) {
 			synchronized (MySQLConnUtils.class) {
@@ -123,10 +145,12 @@ public class MySQLConnUtils {
 		return instance;
 	}
 	
+
+	
 	public static void main(String[] args) {
 		MySQLConnUtils con = new MySQLConnUtils();
 		con.connect();
-		con.getAccount("1");
+		con.getProductCategorys();
 	}
 
 }

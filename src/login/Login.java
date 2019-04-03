@@ -100,6 +100,15 @@ public class Login extends JFrame {
 		panel_1.add(separator_1);
 		
 		txtUsername = new JTextField();
+		txtUsername.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				if (arg0.getKeyCode() == KeyEvent.VK_ENTER) {
+					btnLogin.doClick();
+				}
+			}
+		});
+		txtUsername.setText("adminking");
 		txtUsername.addFocusListener(new FocusAdapter() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -117,6 +126,7 @@ public class Login extends JFrame {
 		txtUsername.setColumns(10);
 		
 		txtPassword = new JPasswordField();
+		txtPassword.setText("123123");
 		txtPassword.addKeyListener(new KeyAdapter() {
 			@Override
 			public void keyPressed(KeyEvent arg0) {
@@ -177,7 +187,7 @@ public class Login extends JFrame {
 							dispose();
 							Main m = new Main();
 							m.setVisible(true);
-							Main.lblAccName.setText("Xin chào, " + txtUsername.getText() + "!");
+							Main.lblAccName.setText(txtUsername.getText());
 							if (account.getRole().equals("1")) {
 								Main.btnThongKe.setEnabled(true);
 								Main.btnQuanLy.setEnabled(true);
@@ -204,6 +214,12 @@ public class Login extends JFrame {
 		btnLogin.setForeground(new Color(255, 255, 255));
 		btnLogin.setBorder(null);
 		panel_1.add(btnLogin);
+		
+		JLabel lblForgotPassword = new JLabel("Forgot password ?!");
+		lblForgotPassword.setForeground(new Color(57, 113, 177));
+		lblForgotPassword.setFont(new Font("Tahoma", Font.PLAIN, 18));
+		lblForgotPassword.setBounds(161, 440, 152, 25);
+		panel_1.add(lblForgotPassword);
 		
 	}
 }

@@ -1,11 +1,13 @@
 package gui;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
+import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JTable;
 import javax.swing.JButton;
@@ -14,6 +16,7 @@ import java.awt.HeadlessException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.text.DateFormat;
+import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,10 +30,13 @@ import com.toedter.calendar.JDateChooser;
 
 import Connection.MySQLConnUtils;
 import bean.Products;
+import gui.PanelStatistical.NumberTableCellRenderer;
 
 import javax.swing.ImageIcon;
 import javax.swing.JScrollPane;
 import javax.swing.SwingConstants;
+import javax.swing.UIManager;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
@@ -67,6 +73,22 @@ public class ManageSP extends JFrame {
 		});
 	}
 	
+	public class NumberTableCellRenderer extends DefaultTableCellRenderer {
+
+        public NumberTableCellRenderer() {
+            setHorizontalAlignment(JLabel.LEFT);
+        }
+
+        @Override
+        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
+            if (value instanceof Number) {
+                value = NumberFormat.getNumberInstance().format(value);
+            }
+            return super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
+        }
+
+    }
+	
 	public void loadDataSP() {
 		MySQLConnUtils connUtils = new MySQLConnUtils();
 		List<Products> products = connUtils.getProducts();
@@ -78,12 +100,23 @@ public class ManageSP extends JFrame {
 		}
 		tableSP.setModel(new DefaultTableModel(list.toArray(new Object[][] {}),
 				new String[] { "ID", "Name", "Category ID", "Unitprice", "Description", "Status", "Created At" }));
+		tableSP.getColumnModel().getColumn(3).setCellRenderer(new NumberTableCellRenderer());
 	}
 
 	/**
 	 * Create the frame.
 	 */
 	public ManageSP() {
+		try {
+			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+				if ("Windows".equals(info.getName())) {
+					UIManager.setLookAndFeel(info.getClassName());
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.getMessage();
+		}
 		setTitle("Qu\u1EA3n L\u00FD S\u1EA3n Ph\u1EA9m");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1085, 850);
@@ -271,6 +304,12 @@ public class ManageSP extends JFrame {
 		contentPane.add(btnDelSP);
 		
 		tableSP = new JTable();
+		tableSP.setForeground(Color.BLACK);
+		tableSP.setRowHeight(30);
+		tableSP.setSelectionBackground(new Color(1, 198, 83));
+		tableSP.setSelectionForeground(new Color(255, 255, 255));
+		tableSP.setGridColor(new Color(255, 255, 255));
+		tableSP.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableSP.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
