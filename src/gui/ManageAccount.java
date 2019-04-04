@@ -82,16 +82,6 @@ public class ManageAccount extends JFrame {
 	 * Create the frame.
 	 */
 	public ManageAccount() {
-		try {
-			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Windows".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.getMessage();
-		}
 		setTitle("Quản Lý Tài Khoản");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 1085, 850);

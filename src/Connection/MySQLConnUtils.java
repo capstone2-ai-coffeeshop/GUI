@@ -15,9 +15,12 @@ import bean.Products;
 import bean.Staffs;
 import bean.Tables;
 import bean.ProductCategory;
+import bean.Bills;
+import bean.BillItems;
 import test.TestStaffsAPI;
 import test.TestProductsAPI;
 import test.TestAccountsAPI;
+import test.TestBillsAPI;
 import test.TestTablesAPI;
 import test.TestProductCategorysAPI;
 
@@ -127,11 +130,25 @@ public class MySQLConnUtils {
 		TestTablesAPI t = new TestTablesAPI();
 		return t.testGetAllTables();
 	}
+	public String updateTable (String id, String quantityOfCustomer, String description, String status) {
+		TestTablesAPI t = new TestTablesAPI();
+		return t.testUpdateTable(id, quantityOfCustomer, description, status);
+	}
 	
 /////////////////////////////////////////////////////
 	public List<ProductCategory> getProductCategorys() {
 		TestProductCategorysAPI t = new TestProductCategorysAPI();
 		return t.testGetAllProductCategorys();
+	}
+	
+/////////////////////////////////////////////////////
+	public String insertBill (String staff_id, String customer_id, String table_id, String created_at) {
+		TestBillsAPI t = new TestBillsAPI();
+		return t.testInsertBills(staff_id, customer_id, table_id, created_at);
+	}
+	public String insertBillInfo (String product_id, String quantity, String session, String weather, String discount, String description) {
+		TestBillsAPI t = new TestBillsAPI();
+		return t.testInsertBillsInfo(product_id, quantity, session, weather, discount, description);
 	}
 	
 	public static MySQLConnUtils getInstance() {
@@ -151,6 +168,7 @@ public class MySQLConnUtils {
 		MySQLConnUtils con = new MySQLConnUtils();
 		con.connect();
 		con.getProductCategorys();
+		con.insertBill("9", "2", "2", "2019/04/04/ 11:36:00");
 	}
 
 }

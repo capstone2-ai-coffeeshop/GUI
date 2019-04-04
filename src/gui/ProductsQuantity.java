@@ -61,16 +61,6 @@ public class ProductsQuantity extends JFrame {
 	 */
 	public ProductsQuantity() {
 		setTitle("S\u1ED1 l\u01B0\u1EE3ng");
-		try {
-			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Windows".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.getMessage();
-		}
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(150, 150, 389, 323);
 		contentPane = new JPanel();

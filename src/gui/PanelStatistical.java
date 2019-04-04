@@ -172,16 +172,6 @@ public class PanelStatistical extends JPanel {
 	 * Create the panel.
 	 */
 	public PanelStatistical() {
-		try {
-			for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
-				if ("Windows".equals(info.getName())) {
-					UIManager.setLookAndFeel(info.getClassName());
-					break;
-				}
-			}
-		} catch (Exception e) {
-			e.getMessage();
-		}
 		setBounds(0, 0, 1902, 905);
 		setBackground(new Color(238, 207, 161));
 		setLayout(null);
