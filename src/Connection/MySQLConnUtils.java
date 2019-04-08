@@ -17,12 +17,14 @@ import bean.Tables;
 import bean.ProductCategory;
 import bean.Bills;
 import bean.BillItems;
+import bean.Customer;
 import test.TestStaffsAPI;
 import test.TestProductsAPI;
 import test.TestAccountsAPI;
 import test.TestBillsAPI;
 import test.TestTablesAPI;
 import test.TestProductCategorysAPI;
+import test.TestCustomersAPI;
 
  
 public class MySQLConnUtils {
@@ -140,6 +142,18 @@ public class MySQLConnUtils {
 		TestProductCategorysAPI t = new TestProductCategorysAPI();
 		return t.testGetAllProductCategorys();
 	}
+	public String insertProductCategory(String name, String description, String created_at) {
+		TestProductCategorysAPI t = new TestProductCategorysAPI();
+		return t.testInsertProductCategory(name, description, created_at);
+	}
+	public String updateProductCategory (String id, String name, String description, String created_at) {
+		TestProductCategorysAPI t = new TestProductCategorysAPI();
+		return t.testUpdateProductCategory(id, name, description, created_at);
+	}
+	public String deleteProductCategory (String id) {
+		TestProductCategorysAPI t = new TestProductCategorysAPI();
+		return t.testDeleteProductCategory(id);
+	}
 	
 /////////////////////////////////////////////////////
 	public String insertBill (String staff_id, String customer_id, String table_id, String created_at) {
@@ -149,6 +163,12 @@ public class MySQLConnUtils {
 	public String insertBillInfo (String product_id, String quantity, String session, String weather, String discount, String description) {
 		TestBillsAPI t = new TestBillsAPI();
 		return t.testInsertBillsInfo(product_id, quantity, session, weather, discount, description);
+	}
+	
+/////////////////////////////////////////////////////
+	public List<Customer> getCustomers() {
+		TestCustomersAPI t = new TestCustomersAPI();
+		return t.testGetAllCustomers();
 	}
 	
 	public static MySQLConnUtils getInstance() {
@@ -167,8 +187,8 @@ public class MySQLConnUtils {
 	public static void main(String[] args) {
 		MySQLConnUtils con = new MySQLConnUtils();
 		con.connect();
-		con.getProductCategorys();
-		con.insertBill("9", "2", "2", "2019/04/04/ 11:36:00");
+		//con.getProductCategorys();
+		//con.insertBill("9", "2", "2", "2019/04/04/ 11:36:00");
 	}
 
 }

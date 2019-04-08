@@ -73,11 +73,9 @@ public class PanelStatistical extends JPanel {
 	private JTable tableOptionDay;
 	private JTable tableOptionDay2;
 	private JTable tableOptionDay3;
-	private JTable tableOptionDay4;
 	private JTable tableAllDay;
 	private JTable tableAllDay2;
 	private JTable tableAllDay3;
-	private JTable tableAllDay4;
 	
 	DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 	
@@ -122,13 +120,17 @@ public class PanelStatistical extends JPanel {
 			DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
 			String dateBegin = df.format(dateChooserBegin.getDate());
 			String dateEnd = df.format(dateChooserEnd.getDate());
-			String sql ="SELECT created_at AS Ngày FROM bills WHERE created_at BETWEEN CAST('" + dateBegin + "' AS DATE) AND CAST('" + dateEnd + "' AS DATE) group by created_at";
+			String sql = "SELECT DATE(bills.created_at) as NGÀY, Sum(quantity*products.unitprice - discount) as 'TỔNG TIỀN' "
+					+ "FROM ai_coffeeshop.bills Join bill_items on bills.id = bill_items.bill_id join products on bill_items.product_id = products.id "
+					+ "WHERE DATE(bills.created_at) BETWEEN CAST('" + dateBegin + "' AS DATE) AND CAST('" + dateEnd + "' AS DATE) "
+					+ "group by DATE(bills.created_at) order by DATE(bills.created_at) DESC";
 			pst = connUtils.connect().prepareStatement(sql);
 			rs = pst.executeQuery();
 			tableOptionDay.setModel(DbUtils.resultSetToTableModel(rs));
-			tableOptionDay2.setModel(new DefaultTableModel(null, new String[] { "Số lượng hóa đơn", "Tổng tiền ngày" }));
-			tableOptionDay3.setModel(new DefaultTableModel(null, new String[] { "ID hóa đơn", "Giảm giá", "Tổng tiền 1 hóa đơn" }));
-			tableOptionDay4.setModel(new DefaultTableModel(null, new String[] { "Tên món", "Số lượng bán" }));
+			tableOptionDay.getColumnModel().getColumn(0).setCellRenderer(new NumberTableCellRenderer());
+			tableOptionDay.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
+			tableOptionDay2.setModel(new DefaultTableModel(null, new String[] { "THỜI GIAN", "ID HÓA ĐƠN", "THÀNH TIỀN", "GIẢM GIÁ", "TỔNG CỘNG" }));
+			tableOptionDay3.setModel(new DefaultTableModel(null, new String[] { "TÊN MÓN", "SỐ LƯỢNG BÁN" }));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -138,13 +140,20 @@ public class PanelStatistical extends JPanel {
 	public void loadStatisticalAll() {
 		try {
 			DateFormat df = new SimpleDateFormat("yyyy/MM/dd");
-			String sql ="SELECT created_at AS Ngày FROM bills group by created_at";
+			String sql = "SELECT DATE(bills.created_at) as NGÀY, Sum(quantity*products.unitprice - discount) as 'TỔNG TIỀN'\r\n" + 
+					"FROM ai_coffeeshop.bills \r\n" + 
+					"Join bill_items\r\n" + 
+					"on bills.id = bill_items.bill_id\r\n" + 
+					"join products\r\n" + 
+					"on bill_items.product_id = products.id\r\n" + 
+					"group by DATE(bills.created_at) order by DATE(bills.created_at) DESC";
 			pst = connUtils.connect().prepareStatement(sql);
 			rs = pst.executeQuery();
 			tableAllDay.setModel(DbUtils.resultSetToTableModel(rs));
-			tableAllDay2.setModel(new DefaultTableModel(null, new String[] { "Số lượng hóa đơn", "Tổng tiền ngày" }));
-			tableAllDay3.setModel(new DefaultTableModel(null, new String[] { "ID hóa đơn", "Giảm giá", "Tổng tiền 1 hóa đơn" }));
-			tableAllDay4.setModel(new DefaultTableModel(null, new String[] { "Tên món", "Số lượng bán" }));
+			tableAllDay.getColumnModel().getColumn(0).setCellRenderer(new NumberTableCellRenderer());
+			tableAllDay.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
+			tableAllDay2.setModel(new DefaultTableModel(null, new String[] { "THỜI GIAN", "ID HÓA ĐƠN", "THÀNH TIỀN", "GIẢM GIÁ", "TỔNG CỘNG" }));
+			tableAllDay3.setModel(new DefaultTableModel(null, new String[] { "TÊN MÓN", "SỐ LƯỢNG BÁN" }));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -154,7 +163,7 @@ public class PanelStatistical extends JPanel {
 	public class NumberTableCellRenderer extends DefaultTableCellRenderer {
 
         public NumberTableCellRenderer() {
-            setHorizontalAlignment(JLabel.RIGHT);
+            setHorizontalAlignment(JLabel.CENTER);
         }
 
         @Override
@@ -247,30 +256,25 @@ public class PanelStatistical extends JPanel {
 		tableOptionDay.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableOptionDay.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mousePressed(MouseEvent arg0) {
 				try {
 					int row = tableOptionDay.getSelectedRow();
 					String table_click = (tableOptionDay.getModel().getValueAt(row, 0).toString());
-					String sql1 ="SELECT count(*) AS 'Số lượng hóa đơn', (Select Sum(quantity*products.unitprice - discount) as 'Tổng tiền ngày' from products join bill_items \r\n" + 
-							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id where bills.created_at = '" + table_click + "' ) as 'Tổng tiền ngày'\r\n" + 
-							"from bills\r\n" + 
-							"where created_at = '" + table_click + "'\r\n" + 
-							"group by created_at";
+					String sql1 ="Select TIME(bills.created_at) as 'THỜI GIAN', bills.id as 'ID HÓA ĐƠN', Sum(quantity*products.unitprice) as 'THÀNH TIỀN', "
+							+ "discount as 'GIẢM GIÁ', Sum(quantity*products.unitprice) - discount as 'TỔNG CỘNG'\r\n" + 
+							"from products join bill_items \r\n" + 
+							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
+							"where DATE(bills.created_at) = '" + table_click + "'\r\n" + 
+							"group by bills.id";
 					pst = connUtils.connect().prepareStatement(sql1);
 					rs = pst.executeQuery();
 					tableOptionDay2.setModel(DbUtils.resultSetToTableModel(rs));
+					tableOptionDay2.getColumnModel().getColumn(0).setCellRenderer(new NumberTableCellRenderer());
 					tableOptionDay2.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
-					
-					String sql2 ="Select bills.id AS 'ID hóa đơn', Sum(discount) as 'Giảm giá', Sum(quantity*products.unitprice - discount) as 'Tổng tiền 1 hóa đơn' \r\n" + 
-							"from products join bill_items \r\n" + 
-							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
-							"where bills.created_at = '" + table_click + "'\r\n" + 
-							"group by bills.id";
-					pst = connUtils.connect().prepareStatement(sql2);
-					rs = pst.executeQuery();
-					tableOptionDay3.setModel(DbUtils.resultSetToTableModel(rs));
-					tableOptionDay3.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
-					tableOptionDay3.getColumnModel().getColumn(2).setCellRenderer(new NumberTableCellRenderer());
+					tableOptionDay2.getColumnModel().getColumn(2).setCellRenderer(new NumberTableCellRenderer());
+					tableOptionDay2.getColumnModel().getColumn(3).setCellRenderer(new NumberTableCellRenderer());
+					tableOptionDay2.getColumnModel().getColumn(4).setCellRenderer(new NumberTableCellRenderer());
+					tableOptionDay3.setModel(new DefaultTableModel(null, new String[] { "TÊN MÓN", "SỐ LƯỢNG BÁN" }));
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -280,10 +284,31 @@ public class PanelStatistical extends JPanel {
 		scrollPane.setViewportView(tableOptionDay);
 		
 		JScrollPane scrollPane_1 = new JScrollPane();
-		scrollPane_1.setBounds(348, 0, 367, 637);
+		scrollPane_1.setBounds(348, 0, 973, 637);
 		panelOption.add(scrollPane_1);
 		
 		tableOptionDay2 = new JTable();
+		tableOptionDay2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				try {
+					int row = tableOptionDay2.getSelectedRow();
+					String table_click = (tableOptionDay2.getModel().getValueAt(row, 1).toString());
+					String sql ="Select products.name AS 'TÊN MÓN', sum(quantity) AS 'SỐ LƯỢNG BÁN' from products join bill_items \r\n" + 
+							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
+							"where bills.id= '" + table_click + "'\r\n" + 
+							"group by products.id";
+					pst = connUtils.connect().prepareStatement(sql);
+					rs = pst.executeQuery();
+					tableOptionDay3.setModel(DbUtils.resultSetToTableModel(rs));
+					tableOptionDay3.getColumnModel().getColumn(0).setCellRenderer(new NumberTableCellRenderer());
+					tableOptionDay3.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		tableOptionDay2.setForeground(Color.BLACK);
 		tableOptionDay2.setRowHeight(30);
 		tableOptionDay2.setSelectionBackground(new Color(1, 198, 83));
@@ -292,9 +317,9 @@ public class PanelStatistical extends JPanel {
 		tableOptionDay2.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		scrollPane_1.setViewportView(tableOptionDay2);
 		
-		JScrollPane scrollPane_2 = new JScrollPane();
-		scrollPane_2.setBounds(727, 0, 594, 637);
-		panelOption.add(scrollPane_2);
+		JScrollPane scrollPane_3 = new JScrollPane();
+		scrollPane_3.setBounds(1333, 0, 506, 637);
+		panelOption.add(scrollPane_3);
 		
 		tableOptionDay3 = new JTable();
 		tableOptionDay3.setForeground(Color.BLACK);
@@ -303,39 +328,7 @@ public class PanelStatistical extends JPanel {
 		tableOptionDay3.setSelectionForeground(new Color(255, 255, 255));
 		tableOptionDay3.setGridColor(new Color(255, 255, 255));
 		tableOptionDay3.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-		tableOptionDay3.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					int row = tableOptionDay3.getSelectedRow();
-					String table_click = (tableOptionDay3.getModel().getValueAt(row, 0).toString());
-					String sql ="Select products.name AS 'Tên món', sum(quantity) AS 'Số lượng bán' from products join bill_items \r\n" + 
-							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
-							"where bills.id= '" + table_click + "'\r\n" + 
-							"group by products.id";
-					pst = connUtils.connect().prepareStatement(sql);
-					rs = pst.executeQuery();
-					tableOptionDay4.setModel(DbUtils.resultSetToTableModel(rs));
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		scrollPane_2.setViewportView(tableOptionDay3);
-		
-		JScrollPane scrollPane_3 = new JScrollPane();
-		scrollPane_3.setBounds(1333, 0, 506, 637);
-		panelOption.add(scrollPane_3);
-		
-		tableOptionDay4 = new JTable();
-		tableOptionDay4.setForeground(Color.BLACK);
-		tableOptionDay4.setRowHeight(30);
-		tableOptionDay4.setSelectionBackground(new Color(1, 198, 83));
-		tableOptionDay4.setSelectionForeground(new Color(255, 255, 255));
-		tableOptionDay4.setGridColor(new Color(255, 255, 255));
-		tableOptionDay4.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-		scrollPane_3.setViewportView(tableOptionDay4);
+		scrollPane_3.setViewportView(tableOptionDay3);
 		
 		JPanel panelAll = new JPanel();
 		panelAll.setLayout(null);
@@ -354,30 +347,25 @@ public class PanelStatistical extends JPanel {
 		tableAllDay.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableAllDay.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mousePressed(MouseEvent arg0) {
 				try {
 					int row = tableAllDay.getSelectedRow();
 					String table_click = (tableAllDay.getModel().getValueAt(row, 0).toString());
-					String sql1 ="SELECT count(*) AS 'Số lượng hóa đơn', (Select Sum(quantity*products.unitprice - discount) as 'Tổng tiền ngày' from products join bill_items \r\n" + 
-							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id where bills.created_at = '" + table_click + "' ) as 'Tổng tiền ngày'\r\n" + 
-							"from bills\r\n" + 
-							"where created_at = '" + table_click + "'\r\n" + 
-							"group by created_at";
+					String sql1 ="Select TIME(bills.created_at) as 'THỜI GIAN', bills.id as 'ID HÓA ĐƠN', Sum(quantity*products.unitprice) as 'THÀNH TIỀN', "
+							+ "discount as 'GIẢM GIÁ', Sum(quantity*products.unitprice) - discount as 'TỔNG CỘNG'\r\n" + 
+							"from products join bill_items \r\n" + 
+							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
+							"where DATE(bills.created_at) = '" + table_click + "'\r\n" + 
+							"group by bills.id";
 					pst = connUtils.connect().prepareStatement(sql1);
 					rs = pst.executeQuery();
 					tableAllDay2.setModel(DbUtils.resultSetToTableModel(rs));
+					tableAllDay2.getColumnModel().getColumn(0).setCellRenderer(new NumberTableCellRenderer());
 					tableAllDay2.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
-					
-					String sql2 ="Select bills.id AS 'ID hóa đơn', Sum(discount) as 'Giảm giá', Sum(quantity*products.unitprice - discount) as 'Tổng tiền 1 hóa đơn' \r\n" + 
-							"from products join bill_items \r\n" + 
-							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
-							"where bills.created_at = '" + table_click + "'\r\n" + 
-							"group by bills.id";
-					pst = connUtils.connect().prepareStatement(sql2);
-					rs = pst.executeQuery();
-					tableAllDay3.setModel(DbUtils.resultSetToTableModel(rs));
-					tableAllDay3.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
-					tableAllDay3.getColumnModel().getColumn(2).setCellRenderer(new NumberTableCellRenderer());
+					tableAllDay2.getColumnModel().getColumn(2).setCellRenderer(new NumberTableCellRenderer());
+					tableAllDay2.getColumnModel().getColumn(3).setCellRenderer(new NumberTableCellRenderer());
+					tableAllDay2.getColumnModel().getColumn(4).setCellRenderer(new NumberTableCellRenderer());
+					tableAllDay3.setModel(new DefaultTableModel(null, new String[] { "TÊN MÓN", "SỐ LƯỢNG BÁN" }));
 				} catch (SQLException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -387,10 +375,31 @@ public class PanelStatistical extends JPanel {
 		scrollPane_4.setViewportView(tableAllDay);
 		
 		JScrollPane scrollPane_5 = new JScrollPane();
-		scrollPane_5.setBounds(348, 0, 367, 636);
+		scrollPane_5.setBounds(348, 0, 973, 636);
 		panelAll.add(scrollPane_5);
 		
 		tableAllDay2 = new JTable();
+		tableAllDay2.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				try {
+					int row = tableAllDay2.getSelectedRow();
+					String table_click = (tableAllDay2.getModel().getValueAt(row, 1).toString());
+					String sql ="Select products.name AS 'TÊN MÓN', sum(quantity) AS 'SỐ LƯỢNG BÁN' from products join bill_items \r\n" + 
+							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
+							"where bills.id= '" + table_click + "'\r\n" + 
+							"group by products.id";
+					pst = connUtils.connect().prepareStatement(sql);
+					rs = pst.executeQuery();
+					tableAllDay3.setModel(DbUtils.resultSetToTableModel(rs));
+					tableAllDay3.getColumnModel().getColumn(0).setCellRenderer(new NumberTableCellRenderer());
+					tableAllDay3.getColumnModel().getColumn(1).setCellRenderer(new NumberTableCellRenderer());
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 		tableAllDay2.setForeground(Color.BLACK);
 		tableAllDay2.setRowHeight(30);
 		tableAllDay2.setSelectionBackground(new Color(1, 198, 83));
@@ -399,9 +408,9 @@ public class PanelStatistical extends JPanel {
 		tableAllDay2.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		scrollPane_5.setViewportView(tableAllDay2);
 		
-		JScrollPane scrollPane_6 = new JScrollPane();
-		scrollPane_6.setBounds(727, 0, 594, 636);
-		panelAll.add(scrollPane_6);
+		JScrollPane scrollPane_7 = new JScrollPane();
+		scrollPane_7.setBounds(1333, 0, 506, 636);
+		panelAll.add(scrollPane_7);
 		
 		tableAllDay3 = new JTable();
 		tableAllDay3.setForeground(Color.BLACK);
@@ -410,33 +419,7 @@ public class PanelStatistical extends JPanel {
 		tableAllDay3.setSelectionForeground(new Color(255, 255, 255));
 		tableAllDay3.setGridColor(new Color(255, 255, 255));
 		tableAllDay3.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
-		tableAllDay3.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					int row = tableAllDay3.getSelectedRow();
-					String table_click = (tableAllDay3.getModel().getValueAt(row, 0).toString());
-					String sql ="Select products.name AS 'Tên món', sum(quantity) AS 'Số lượng bán' from products join bill_items \r\n" + 
-							"on products.id = bill_items.product_id join bills on bills.id = bill_items.bill_id \r\n" + 
-							"where bills.id= '" + table_click + "'\r\n" + 
-							"group by products.id";
-					pst = connUtils.connect().prepareStatement(sql);
-					rs = pst.executeQuery();
-					tableAllDay4.setModel(DbUtils.resultSetToTableModel(rs));
-				} catch (SQLException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		scrollPane_6.setViewportView(tableAllDay3);
-		
-		JScrollPane scrollPane_7 = new JScrollPane();
-		scrollPane_7.setBounds(1333, 0, 506, 636);
-		panelAll.add(scrollPane_7);
-		
-		tableAllDay4 = new JTable();
-		scrollPane_7.setViewportView(tableAllDay4);
+		scrollPane_7.setViewportView(tableAllDay3);
 
 	}
 }

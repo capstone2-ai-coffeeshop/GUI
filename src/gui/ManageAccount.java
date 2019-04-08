@@ -47,8 +47,8 @@ public class ManageAccount extends JFrame {
 	private JPanel contentPane;
 	private JTextField txtPassword;
 	private JTextField txtUsername;
-	private JTextField txtID;
 	private JTable tableA;
+	private String idAccount;
 
 	/**
 	 * Launch the application.
@@ -72,7 +72,14 @@ public class ManageAccount extends JFrame {
 
 		List<Object[]> list = new ArrayList<Object[]>();
 		for (Account account : accounts) {
-			list.add(new Object[] { account.getId(), account.getUsername(), account.getPassword(), account.getRole() });
+			String role = "";
+			if (account.getRole().equals("1")) {
+				role = "Admin";
+			}
+			if (account.getRole().equals("0")) {
+				role = "Saleman";
+			}
+			list.add(new Object[] { account.getId(), account.getUsername(), account.getPassword(), role });
 		}
 		tableA.setModel(new DefaultTableModel(list.toArray(new Object[][] {}),
 				new String[] { "ID", "User name", "Password", "Role" }));
@@ -127,22 +134,6 @@ public class ManageAccount extends JFrame {
 		lblUsername.setBounds(12, 584, 157, 31);
 		contentPane.add(lblUsername);
 		
-		JLabel lblID = new JLabel("ID:");
-		lblID.setForeground(Color.BLACK);
-		lblID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblID.setBounds(12, 533, 157, 31);
-		contentPane.add(lblID);
-		
-		txtID = new JTextField();
-		txtID.setHorizontalAlignment(SwingConstants.TRAILING);
-		txtID.setForeground(Color.BLACK);
-		txtID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		txtID.setEditable(false);
-		txtID.setColumns(10);
-		txtID.setBackground(Color.WHITE);
-		txtID.setBounds(177, 533, 250, 38);
-		contentPane.add(txtID);
-		
 		JScrollPane scrollPane = new JScrollPane();
 		scrollPane.setBounds(12, 13, 1043, 476);
 		contentPane.add(scrollPane);
@@ -194,7 +185,7 @@ public class ManageAccount extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					MySQLConnUtils connUtils = new MySQLConnUtils();
-					connUtils.deleteAccount(txtID.getText());
+					connUtils.deleteAccount(idAccount);
 					DefaultTableModel model = (DefaultTableModel)tableA.getModel();
 					model.setRowCount(0);
 					loadDataA();
@@ -221,7 +212,7 @@ public class ManageAccount extends JFrame {
 		tableA.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableA.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mousePressed(MouseEvent arg0) {
 				try {
 					int row = tableA.getSelectedRow();
 					String table_click = (tableA.getModel().getValueAt(row, 0).toString());
@@ -229,7 +220,7 @@ public class ManageAccount extends JFrame {
 					pst = mySQLCon.connect().prepareStatement(sql);
 					rs = pst.executeQuery();
 					if (rs.next()) {
-						txtID.setText(rs.getString("id"));
+						idAccount = rs.getString("id");
 						txtUsername.setText(rs.getString("username"));
 						txtPassword.setText(rs.getString("password"));
 						if (rs.getString("role").equals("1")) {

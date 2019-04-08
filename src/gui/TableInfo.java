@@ -114,6 +114,10 @@ public class TableInfo extends JFrame {
 				PanelOrder.panel_5.repaint();
 				PanelOrder.panel.revalidate();
 				PanelOrder.panel.repaint();
+				PanelOrder.panel_8.removeAll();
+				PanelOrder.loadNumberServing();
+				PanelOrder.panel_8.revalidate();
+				PanelOrder.panel_8.repaint();
 			}
 		});
 		btnDonBan.setIcon(new ImageIcon(TableInfo.class.getResource("/images/broom_40px.png")));

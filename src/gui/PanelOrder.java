@@ -46,12 +46,6 @@ import java.text.DateFormat;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.awt.event.ActionEvent;
 import javax.swing.JComboBox;
 import javax.swing.JSpinner;
@@ -66,6 +60,10 @@ import javax.swing.ScrollPaneConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.util.*;
 
 import javax.swing.border.EtchedBorder;
 
@@ -87,6 +85,7 @@ public class PanelOrder extends JPanel {
 	public static JPanel panel_5;
 	private JPanel panel_6;
 	private JPanel panel_7;
+	public static JPanel panel_8;
 	private JPanel panelProducts;
 	public static JButton btnBan;
 	private JButton btnCategory;
@@ -184,7 +183,31 @@ public class PanelOrder extends JPanel {
 		cbbTableID.revalidate();
 		cbbTableID.repaint();
 	}
-	public void loadNumberServing() {
+	public static void loadNumberServing() {
+		JLabel lblNewLabel_1 = new JLabel("Đang phục vụ:");
+		lblNewLabel_1.setBounds(0, 13, 105, 26);
+		panel_8.add(lblNewLabel_1);
+		lblNewLabel_1.setForeground(Color.BLACK);
+		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 15));
+		
+		lblNumberServing = new JLabel("");
+		lblNumberServing.setBounds(118, 13, 41, 26);
+		panel_8.add(lblNumberServing);
+		lblNumberServing.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNumberServing.setForeground(Color.BLACK);
+		lblNumberServing.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		
+		JLabel label = new JLabel("/");
+		label.setBounds(168, 13, 6, 26);
+		panel_8.add(label);
+		label.setForeground(Color.BLACK);
+		label.setFont(new Font("Tahoma", Font.PLAIN, 15));
+		
+		lblTotalTable = new JLabel("");
+		lblTotalTable.setBounds(186, 13, 78, 26);
+		panel_8.add(lblTotalTable);
+		lblTotalTable.setForeground(Color.BLACK);
+		lblTotalTable.setFont(new Font("Tahoma", Font.PLAIN, 15));
 		try {
 			String sql1 = "select count(*) as count from tables where status = '1'";
 			pst = connUtils.connect().prepareStatement(sql1);
@@ -202,6 +225,8 @@ public class PanelOrder extends JPanel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		panel_8.revalidate();
+		panel_8.repaint();
 	}
 	
 	public void loadMenuCategory() {
@@ -284,7 +309,7 @@ public class PanelOrder extends JPanel {
 							int a = Integer.parseInt(rs.getString("id"));
 							panelProducts.addMouseListener(new MouseAdapter() {
 								@Override
-								public void mouseClicked(MouseEvent arg0) {
+								public void mousePressed(MouseEvent arg0) {
 									lblTimeOrder.setText(new SimpleDateFormat("yyyy/MM/dd HH:mm:ss").format(new Date()));
 //									try {
 //										String sql1 = "select * from products where id = '" + a + "'";
@@ -443,6 +468,7 @@ public class PanelOrder extends JPanel {
 					cbbTab = null;
 				}
 				double z = 0;
+				txtTable.setText(cbbTableID.getSelectedItem().toString());
 				DecimalFormat formatter = new DecimalFormat("###,###,###.##");
 				if (!cbbTableID.getSelectedItem().toString().equals("")) {
 					for (int y = 0; y < tableProductChoose.getRowCount(); y++) {
@@ -458,6 +484,7 @@ public class PanelOrder extends JPanel {
 					panel_5.revalidate();
 					panel_5.repaint();
 				}
+				
 				connUtils.insertBill(txtStaffID.getText(), txtCustomerID.getText(), cbbTab, lblTimeOrder.getText());
 				Calendar c = Calendar.getInstance();
 				int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
@@ -479,7 +506,6 @@ public class PanelOrder extends JPanel {
 						connUtils.insertBillInfo(rs.getString("id"), tableProductChoose.getValueAt(y, 3).toString(), String.valueOf(session), "1", txtGiamgiaOrder.getText(), "No description");
 					}
 				}
-				txtTable.setText(cbbTableID.getSelectedItem().toString());
 				Object[] columns = {"TÊN MÓN", "SỐ LƯỢNG", "ĐƠN GIÁ", "THÀNH TIỀN"};
 				Object[] rows = new Object[4];
 				model1 = (DefaultTableModel)tableBillItems.getModel();
@@ -516,6 +542,10 @@ public class PanelOrder extends JPanel {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		panel_8.removeAll();
+		loadNumberServing();
+		panel_8.revalidate();
+		panel_8.repaint();
 	}
 	public class NumberTableCellRenderer extends DefaultTableCellRenderer {
 
@@ -532,6 +562,71 @@ public class PanelOrder extends JPanel {
         }
 
     }
+	
+	public void inBill() {
+		String idTBill = "";
+		String timeOrder = "";
+		try {
+			String sqlT = "select * from bills where id = (select MAX(id) from bills)";
+			pst = connUtils.connect().prepareStatement(sqlT);
+			rs = pst.executeQuery();
+			if (rs.next()) {
+				idTBill = rs.getString("id");
+				timeOrder = rs.getString("created_at");
+			}
+		} catch (Exception e1) {
+			e1.printStackTrace();
+		}
+		File newFile = new File("D:/4_Projects/FilesCreate/Bill" + idTBill + ".txt");
+		if (newFile.exists()) {
+			System.out.println("The file already exists!");
+		} else {
+			try {
+				newFile.createNewFile();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			DecimalFormat formatterNum = new DecimalFormat("###,###,###.##");
+			try {
+				FileWriter fileW = new FileWriter(newFile);
+				BufferedWriter buffW = new BufferedWriter(fileW);
+				buffW.write("---------------------------------------------------------\n");
+				buffW.write("               AI COFFEE SHOP BILL RECEIPT               \n");
+				buffW.write("---------------------------------------------------------\n");
+				buffW.write("Bill ID:      " + idTBill +                             "\n");
+				buffW.write("Tên khách hàng:     " + txtCustomerName.getText() +     "\n");
+				buffW.write("Thời gian:    " + timeOrder +                           "\n");
+				buffW.write("Bàn:    " + txtTable.getText() +                        "\n");
+				buffW.write("_________________________________________________________\n");
+				buffW.write("|                                                       |\n");
+				buffW.write("| Tên món                SL     Đơn giá     Thành tiền  |\n");
+				buffW.write("|_______________________________________________________|\n");
+				for (int k = 0; k < tableBillItems.getRowCount(); k++) {
+					Formatter formatter = new Formatter();
+					String formatter123 = formatter.format("%-22s %-6s %-13s %-10s", tableBillItems.getValueAt(k, 0).toString(), 
+							tableBillItems.getValueAt(k, 1).toString(), formatterNum.format(Double.parseDouble(tableBillItems.getValueAt(k, 2).toString())), 
+							formatterNum.format(Double.parseDouble(tableBillItems.getValueAt(k, 3).toString()))).toString();
+					buffW.write("| " + formatter123 + "|\n");
+				}
+//				buffW.write("| Oreo Đá xay            1      42000          42000    |\n");
+//				buffW.write("| Oreo Đá xay            1      42000          42000    |\n");
+				buffW.write("|_______________________________________________________|\n");
+				buffW.write("                                                         \n");
+				buffW.write("Thành tiền:                                   " + txtThanhtien.getText() + "\n");
+				buffW.write("Giảm giá:                                     " + txtGiamgia.getText() + "\n");
+				buffW.write("Tổng cộng:                                    " + txtTongCong.getText() + "\n");
+				buffW.write("Tiền khách đưa:                                          \n");
+				buffW.write("Tiền trả lại:                                            \n");
+				buffW.write("                                                         \n");
+				buffW.write("_________________________________________________________\n");
+				buffW.write("                                                         \n");
+				buffW.write("           Cảm ơn quý khách và hẹn gặp lại !!!           \n");
+				buffW.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 	/**
 	 * Create the panel.
@@ -545,7 +640,7 @@ public class PanelOrder extends JPanel {
 		panel = new JPanel();
 		panel.setForeground(Color.BLACK);
 		panel.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 3, true), "B\u00E0n", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
-		panel.setBounds(12, 13, 344, 807);
+		panel.setBounds(10, 13, 344, 807);
 		panel.setBackground(new Color(238, 207, 161));
 		add(panel);
 		
@@ -606,6 +701,7 @@ public class PanelOrder extends JPanel {
 		JButton btnThanhToan = new JButton("Thanh Toán");
 		btnThanhToan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				inBill();
 				for( int i = model1.getRowCount() - 1; i >= 0; i-- ) {
 					model1.removeRow(i);
 			    }
@@ -740,32 +836,6 @@ public class PanelOrder extends JPanel {
 		label_3.setBounds(412, 742, 40, 22);
 		panel_2.add(label_3);
 		
-		JLabel lblNewLabel_1 = new JLabel("Đang phục vụ:");
-		lblNewLabel_1.setForeground(Color.BLACK);
-		lblNewLabel_1.setFont(new Font("Tahoma", Font.BOLD, 15));
-		lblNewLabel_1.setBounds(12, 836, 105, 26);
-		add(lblNewLabel_1);
-		
-		lblNumberServing = new JLabel("");
-		lblNumberServing.setHorizontalAlignment(SwingConstants.CENTER);
-		lblNumberServing.setForeground(Color.BLACK);
-		lblNumberServing.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblNumberServing.setBounds(121, 836, 41, 26);
-		add(lblNumberServing);
-		
-		JLabel label = new JLabel("/");
-		label.setForeground(Color.BLACK);
-		label.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		label.setBounds(174, 836, 6, 26);
-		add(label);
-		
-		lblTotalTable = new JLabel("");
-		lblTotalTable.setHorizontalAlignment(SwingConstants.CENTER);
-		lblTotalTable.setForeground(Color.BLACK);
-		lblTotalTable.setFont(new Font("Tahoma", Font.PLAIN, 15));
-		lblTotalTable.setBounds(192, 836, 78, 26);
-		add(lblTotalTable);
-		
 		panel_3 = new JPanel();
 		panel_3.setBorder(new TitledBorder(new LineBorder(new Color(0, 0, 0), 2, true), "Danh m\u1EE5c", TitledBorder.LEADING, TitledBorder.TOP, null, new Color(0, 0, 0)));
 		panel_3.setBounds(12, 29, 515, 211);
@@ -833,7 +903,7 @@ public class PanelOrder extends JPanel {
 				tableProductChoose = new JTable();
 				tableProductChoose.addMouseListener(new MouseAdapter() {
 					@Override
-					public void mouseClicked(MouseEvent arg0) {
+					public void mousePressed(MouseEvent arg0) {
 						ProductsQuantity pQ = new ProductsQuantity();
 						pQ.setLocationRelativeTo(null);
 						pQ.setVisible(true);
@@ -981,6 +1051,12 @@ public class PanelOrder extends JPanel {
 				lblTableID.setFont(new Font("Tahoma", Font.PLAIN, 18));
 				lblTableID.setBounds(175, 167, 49, 22);
 				panel_5.add(lblTableID);
+				
+				panel_8 = new JPanel();
+				panel_8.setBounds(12, 831, 344, 47);
+				panel_8.setBackground(new Color(238, 207, 161));
+				add(panel_8);
+				panel_8.setLayout(null);
 		
 		
 		loadTable();

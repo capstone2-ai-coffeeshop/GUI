@@ -45,13 +45,13 @@ public class ManageNV extends JFrame {
 	PreparedStatement pst = null;
 
 	private JPanel contentPane;
-	private JTextField txtAccountID;
 	private JTextField txtPhone;
 	private JTextField txtEmail;
 	private JTextField txtFullname;
 
 	private JTable tableNV;
-	private JTextField txtID;
+	private String idStaff;
+	private String idAccount;
 
 	/**
 	 * Launch the application.
@@ -100,8 +100,15 @@ public class ManageNV extends JFrame {
 
 		List<Object[]> list = new ArrayList<Object[]>();
 		for (Staffs staff : staffs) {
+			String gender = "";
+			if (staff.getGender().equals("1")) {
+				gender = "Male";
+			}
+			if (staff.getGender().equals("0")) {
+				gender = "Female";
+			}
 			list.add(new Object[] { staff.getId(), staff.getFullname(), staff.getEmail(), staff.getDateOfBirth(),
-					staff.getPhone(), staff.getGender(), staff.getAccountId() });
+					staff.getPhone(), gender, staff.getAccountId() });
 		}
 		tableNV.setModel(new DefaultTableModel(list.toArray(new Object[][] {}),
 				new String[] { "ID", "Full name", "Email", "DOB", "Phone number", "Gender", "Account's ID" }));
@@ -120,31 +127,6 @@ public class ManageNV extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setBackground(new Color(238, 207, 161));
 		contentPane.setLayout(null);
-		
-		JLabel lblID = new JLabel("ID:");
-		lblID.setForeground(Color.BLACK);
-		lblID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblID.setBounds(12, 533, 157, 31);
-		contentPane.add(lblID);
-		
-		txtID = new JTextField();
-		txtID.setEditable(false);
-		txtID.setHorizontalAlignment(SwingConstants.TRAILING);
-		txtID.setForeground(Color.BLACK);
-		txtID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		txtID.setColumns(10);
-		txtID.setBackground(Color.WHITE);
-		txtID.setBounds(177, 533, 250, 38);
-		contentPane.add(txtID);
-
-		txtAccountID = new JTextField();
-		txtAccountID.setHorizontalAlignment(SwingConstants.TRAILING);
-		txtAccountID.setForeground(Color.BLACK);
-		txtAccountID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		txtAccountID.setColumns(10);
-		txtAccountID.setBackground(Color.WHITE);
-		txtAccountID.setBounds(805, 635, 250, 38);
-		contentPane.add(txtAccountID);
 
 		txtPhone = new JTextField();
 		txtPhone.setHorizontalAlignment(SwingConstants.TRAILING);
@@ -173,17 +155,11 @@ public class ManageNV extends JFrame {
 		lblPhone.setBounds(636, 584, 157, 31);
 		contentPane.add(lblPhone);
 
-		JLabel lblAccountID = new JLabel("AccountID:");
-		lblAccountID.setForeground(Color.BLACK);
-		lblAccountID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblAccountID.setBounds(636, 635, 157, 31);
-		contentPane.add(lblAccountID);
-
 		JRadioButton rdbtnFemale = new JRadioButton("FeMale");
 		rdbtnFemale.setForeground(Color.BLACK);
 		rdbtnFemale.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		rdbtnFemale.setBackground(Color.WHITE);
-		rdbtnFemale.setBounds(296, 686, 105, 31);
+		rdbtnFemale.setBounds(296, 635, 105, 31);
 		contentPane.add(rdbtnFemale);
 
 		txtEmail = new JTextField();
@@ -192,7 +168,7 @@ public class ManageNV extends JFrame {
 		txtEmail.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		txtEmail.setColumns(10);
 		txtEmail.setBackground(Color.WHITE);
-		txtEmail.setBounds(177, 635, 250, 38);
+		txtEmail.setBounds(177, 584, 250, 38);
 		contentPane.add(txtEmail);
 
 		txtFullname = new JTextField();
@@ -201,14 +177,14 @@ public class ManageNV extends JFrame {
 		txtFullname.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		txtFullname.setColumns(10);
 		txtFullname.setBackground(Color.WHITE);
-		txtFullname.setBounds(177, 584, 250, 38);
+		txtFullname.setBounds(177, 533, 250, 38);
 		contentPane.add(txtFullname);
 		
 		JRadioButton rdbtnMale = new JRadioButton("Male");
 		rdbtnMale.setForeground(Color.BLACK);
 		rdbtnMale.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		rdbtnMale.setBackground(Color.WHITE);
-		rdbtnMale.setBounds(177, 686, 79, 31);
+		rdbtnMale.setBounds(177, 635, 79, 31);
 		contentPane.add(rdbtnMale);
 
 		JButton btnAddNV = new JButton("Thêm");
@@ -227,7 +203,7 @@ public class ManageNV extends JFrame {
 					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 					String dOB = df.format(txtDOB.getDate());
 					String phone = txtPhone.getText();
-					String accountID = txtAccountID.getText();
+					String accountID = idAccount;
 					connUtils.insertStaff(fullname, email, gender, dOB, phone, accountID);
 					DefaultTableModel model = (DefaultTableModel)tableNV.getModel();
 					model.setRowCount(0);
@@ -258,7 +234,7 @@ public class ManageNV extends JFrame {
 					}
 					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 					String dOB = df.format(txtDOB.getDate());
-					connUtils.updateStaff(txtID.getText(), txtFullname.getText(), txtEmail.getText(), gender, dOB, txtPhone.getText());
+					connUtils.updateStaff(idStaff, txtFullname.getText(), txtEmail.getText(), gender, dOB, txtPhone.getText());
 					DefaultTableModel model = (DefaultTableModel)tableNV.getModel();
 					model.setRowCount(0);
 					loadDataNV3();
@@ -280,7 +256,7 @@ public class ManageNV extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					MySQLConnUtils connUtils = new MySQLConnUtils();
-					connUtils.deleteStaff(txtID.getText());
+					connUtils.deleteStaff(idStaff);
 					DefaultTableModel model = (DefaultTableModel)tableNV.getModel();
 					model.setRowCount(0);
 					loadDataNV3();
@@ -301,19 +277,19 @@ public class ManageNV extends JFrame {
 		JLabel lblGender = new JLabel("Gender:");
 		lblGender.setForeground(Color.BLACK);
 		lblGender.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblGender.setBounds(12, 686, 157, 31);
+		lblGender.setBounds(12, 635, 157, 31);
 		contentPane.add(lblGender);
 
 		JLabel lblEmail = new JLabel("Email:");
 		lblEmail.setForeground(Color.BLACK);
 		lblEmail.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblEmail.setBounds(12, 635, 157, 31);
+		lblEmail.setBounds(12, 584, 157, 31);
 		contentPane.add(lblEmail);
 
 		JLabel lblFullname = new JLabel("Fullname:");
 		lblFullname.setForeground(Color.BLACK);
 		lblFullname.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblFullname.setBounds(12, 584, 157, 31);
+		lblFullname.setBounds(12, 533, 157, 31);
 		contentPane.add(lblFullname);
 
 		JScrollPane scrollPane = new JScrollPane();
@@ -329,7 +305,7 @@ public class ManageNV extends JFrame {
 		tableNV.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableNV.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mousePressed(MouseEvent arg0) {
 				try {
 					int row = tableNV.getSelectedRow();
 					String table_click = (tableNV.getModel().getValueAt(row, 0).toString());
@@ -337,7 +313,7 @@ public class ManageNV extends JFrame {
 					pst = mySQLCon.connect().prepareStatement(sql);
 					rs = pst.executeQuery();
 					if (rs.next()) {
-						txtID.setText(rs.getString("id"));
+						idStaff = rs.getString("id");
 						txtFullname.setText(rs.getString("full_name"));
 						txtEmail.setText(rs.getString("email"));
 						if (rs.getString("gender").equals("1")) {
@@ -350,7 +326,7 @@ public class ManageNV extends JFrame {
 						Date dOB = new SimpleDateFormat("dd/MM/yyyy").parse(rs.getString("date_of_birth"));
 						txtDOB.setDate(dOB);
 						txtPhone.setText(rs.getString("phone"));
-						txtAccountID.setText(rs.getString("account_id"));
+						idAccount = rs.getString("account_id");
 					}
 				} catch (Exception e) {
 					e.printStackTrace();

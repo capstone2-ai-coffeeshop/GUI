@@ -115,6 +115,34 @@ public class PanelManage extends JPanel {
 		btnManageAccount.setBounds(543, 522, 308, 128);
 		panel.add(btnManageAccount);
 		
+		JButton btnManageCategory = new JButton("Danh mục");
+		btnManageCategory.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ManageCategory mC = new ManageCategory();
+				mC.setLocationRelativeTo(null);
+				mC.setVisible(true);
+			}
+		});
+		btnManageCategory.setIcon(new ImageIcon(PanelManage.class.getResource("/images/backend.png")));
+		btnManageCategory.setFont(new Font("Tahoma", Font.PLAIN, 21));
+		btnManageCategory.setBackground(Color.WHITE);
+		btnManageCategory.setBounds(979, 141, 308, 128);
+		panel.add(btnManageCategory);
+		
+		JButton btnManageCustomer = new JButton("Khách hàng");
+		btnManageCustomer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				ManageCustomer mCus = new ManageCustomer();
+				mCus.setLocationRelativeTo(null);
+				mCus.setVisible(true);
+			}
+		});
+		btnManageCustomer.setIcon(new ImageIcon(PanelManage.class.getResource("/images/segment.png")));
+		btnManageCustomer.setFont(new Font("Tahoma", Font.PLAIN, 21));
+		btnManageCustomer.setBackground(Color.WHITE);
+		btnManageCustomer.setBounds(979, 331, 308, 128);
+		panel.add(btnManageCustomer);
+		
 		JLabel label = new JLabel("");
 		label.setBounds(0, 0, 1902, 905);
 		add(label);

@@ -5,20 +5,18 @@ public class Bills {
 	private String staffId;
 	private String customerId;
 	private String tableId;
-	private String status;
 	private String createAt;
 
 	public Bills() {
 		super();
 	}
 
-	public Bills(String id, String staffId, String customerId, String tableId, String status, String createAt) {
+	public Bills(String id, String staffId, String customerId, String tableId, String createAt) {
 		super();
 		this.id = id;
 		this.staffId = staffId;
 		this.customerId = customerId;
 		this.tableId = tableId;
-		this.status = status;
 		this.createAt = createAt;
 	}
 
@@ -52,14 +50,6 @@ public class Bills {
 
 	public void setTableId(String tableId) {
 		this.tableId = tableId;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
 	}
 
 	public String getCreateAt() {

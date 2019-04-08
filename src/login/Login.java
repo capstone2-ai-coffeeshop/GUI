@@ -28,6 +28,7 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -181,8 +182,34 @@ public class Login extends JFrame {
 		btnLogin.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					List<Account> accounts = connUtils.getAccounts();
-					for (Account account : accounts) {
+					if (txtUsername.getText().isEmpty()) {
+						lblErrUsername.setText("Tên đăng nhập trống!");
+					} else {
+						lblErrUsername.setText("");
+					}
+					if (txtPassword.getText().isEmpty()) {
+						lblErrPassword.setText("Mật khẩu trống!");
+					} else {
+						lblErrPassword.setText("");
+					}
+					Statement stmt = null;
+					Account account = null;
+					String queryC = "select * from accounts where username = '" + txtUsername.getText() + "'";
+					stmt = connUtils.createConnection().createStatement();
+					rs = stmt.executeQuery(queryC);
+					while (rs.next()) {
+						account = new Account();
+						account.setId(rs.getString("id"));
+						account.setUsername(rs.getString("username"));
+						account.setPassword(rs.getString("password"));
+						account.setRole(rs.getString("role"));
+					}
+					if (account == null && !txtUsername.getText().isEmpty() && !txtPassword.getText().isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Username không hợp lệ!");
+					} else if (!txtUsername.getText().isEmpty() && !txtPassword.getText().isEmpty()) {
+						if (!txtPassword.getText().equals(account.getPassword())) {
+							JOptionPane.showMessageDialog(null, "Password không hợp lệ!");
+						}
 						if (txtUsername.getText().equals(account.getUsername()) && txtPassword.getText().equals(account.getPassword())) {
 							dispose();
 							Main m = new Main();
@@ -196,15 +223,9 @@ public class Login extends JFrame {
 								Main.btnQuanLy.setEnabled(false);
 							}
 						}
-						if (txtUsername.getText().isEmpty()) {
-							lblErrUsername.setText("Tên đăng nhập trống!");
-						}
-						if (txtUsername.getText().isEmpty()) {
-							lblErrPassword.setText("Mật khẩu trống!");
-						}
 					}
 				} catch (Exception e) {
-					JOptionPane.showMessageDialog(null, e);
+					e.printStackTrace();
 				}
 			}
 		});

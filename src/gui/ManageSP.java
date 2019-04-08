@@ -41,9 +41,10 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JComboBox;
 
 public class ManageSP extends JFrame {
-	MySQLConnUtils mySQLCon = new MySQLConnUtils();
+	MySQLConnUtils connUtils = new MySQLConnUtils();
 	ResultSet rs = null;
 	PreparedStatement pst = null;
 
@@ -52,10 +53,12 @@ public class ManageSP extends JFrame {
 	private JTextField txtDescription;
 	private JTextField txtUnitprice;
 	private JTextField txtName;
-	private JTextField txtCategoryID;
 	private JTextField txtStatus;
-	private JTextField txtID;
 	private JDateChooser txtCreatedAt;
+	private JComboBox cbbCategoryName;
+	private String idProduct;
+	private String nameCategory;
+	private String idCategory;
 
 	/**
 	 * Launch the application.
@@ -95,11 +98,21 @@ public class ManageSP extends JFrame {
 
 		List<Object[]> list = new ArrayList<Object[]>();
 		for (Products product : products) {
-			list.add(new Object[] { product.getId(), product.getName(), product.getCategoryId(), product.getUnitPrice(),
+			try {
+				String sqlABC = "select * from product_category where id = '" + product.getCategoryId() + "'";
+				pst = connUtils.connect().prepareStatement(sqlABC);
+				rs = pst.executeQuery();
+				if (rs.next()) {
+					nameCategory = rs.getString("name");
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			list.add(new Object[] { product.getId(), product.getName(), nameCategory, product.getUnitPrice(),
 					product.getDescription(), product.getStatus(), product.getCreatedAt() });
 		}
 		tableSP.setModel(new DefaultTableModel(list.toArray(new Object[][] {}),
-				new String[] { "ID", "Name", "Category ID", "Unitprice", "Description", "Status", "Created At" }));
+				new String[] { "ID", "Name", "Category Name", "Unitprice", "Description", "Status", "Created At" }));
 		tableSP.getColumnModel().getColumn(3).setCellRenderer(new NumberTableCellRenderer());
 	}
 
@@ -128,11 +141,11 @@ public class ManageSP extends JFrame {
 		txtDescription.setBounds(805, 584, 250, 38);
 		contentPane.add(txtDescription);
 		
-		JLabel lblCategoryID = new JLabel("CategoryID:");
-		lblCategoryID.setForeground(Color.BLACK);
-		lblCategoryID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblCategoryID.setBounds(636, 533, 157, 31);
-		contentPane.add(lblCategoryID);
+		JLabel lblCategoryName = new JLabel("Category Name:");
+		lblCategoryName.setForeground(Color.BLACK);
+		lblCategoryName.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		lblCategoryName.setBounds(614, 533, 179, 31);
+		contentPane.add(lblCategoryName);
 		
 		JLabel lblDescription = new JLabel("Description:");
 		lblDescription.setForeground(Color.BLACK);
@@ -151,7 +164,7 @@ public class ManageSP extends JFrame {
 		txtUnitprice.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		txtUnitprice.setColumns(10);
 		txtUnitprice.setBackground(Color.WHITE);
-		txtUnitprice.setBounds(177, 635, 250, 38);
+		txtUnitprice.setBounds(177, 584, 250, 38);
 		contentPane.add(txtUnitprice);
 		
 		txtName = new JTextField();
@@ -159,41 +172,33 @@ public class ManageSP extends JFrame {
 		txtName.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		txtName.setColumns(10);
 		txtName.setBackground(Color.WHITE);
-		txtName.setBounds(177, 584, 250, 38);
+		txtName.setBounds(177, 533, 250, 38);
 		contentPane.add(txtName);
 		
 		JLabel lblStatus = new JLabel("Status:");
 		lblStatus.setForeground(Color.BLACK);
 		lblStatus.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblStatus.setBounds(12, 686, 157, 31);
+		lblStatus.setBounds(12, 635, 157, 31);
 		contentPane.add(lblStatus);
 		
 		JLabel lblUnitprice = new JLabel("Unitprice:");
 		lblUnitprice.setForeground(Color.BLACK);
 		lblUnitprice.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblUnitprice.setBounds(12, 635, 157, 31);
+		lblUnitprice.setBounds(12, 584, 157, 31);
 		contentPane.add(lblUnitprice);
 		
 		JLabel lblName = new JLabel("Name:");
 		lblName.setForeground(Color.BLACK);
 		lblName.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblName.setBounds(12, 584, 157, 31);
+		lblName.setBounds(12, 533, 157, 31);
 		contentPane.add(lblName);
-		
-		txtCategoryID = new JTextField();
-		txtCategoryID.setForeground(Color.BLACK);
-		txtCategoryID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		txtCategoryID.setColumns(10);
-		txtCategoryID.setBackground(Color.WHITE);
-		txtCategoryID.setBounds(805, 533, 250, 38);
-		contentPane.add(txtCategoryID);
 		
 		txtStatus = new JTextField();
 		txtStatus.setForeground(Color.BLACK);
 		txtStatus.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		txtStatus.setColumns(10);
 		txtStatus.setBackground(Color.WHITE);
-		txtStatus.setBounds(177, 686, 250, 38);
+		txtStatus.setBounds(177, 635, 250, 38);
 		contentPane.add(txtStatus);
 		
 		txtCreatedAt = new JDateChooser();
@@ -202,20 +207,22 @@ public class ManageSP extends JFrame {
 		txtCreatedAt.setBounds(805, 635, 250, 38);
 		contentPane.add(txtCreatedAt);
 		
-		JLabel lblID = new JLabel("ID:");
-		lblID.setForeground(Color.BLACK);
-		lblID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		lblID.setBounds(12, 533, 157, 31);
-		contentPane.add(lblID);
-		
-		txtID = new JTextField();
-		txtID.setEditable(false);
-		txtID.setForeground(Color.BLACK);
-		txtID.setFont(new Font("Tahoma", Font.PLAIN, 25));
-		txtID.setColumns(10);
-		txtID.setBackground(Color.WHITE);
-		txtID.setBounds(177, 533, 250, 38);
-		contentPane.add(txtID);
+		cbbCategoryName = new JComboBox();
+		cbbCategoryName.setFont(new Font("Tahoma", Font.PLAIN, 25));
+		cbbCategoryName.setEditable(true);
+		cbbCategoryName.setForeground(Color.BLACK);
+		cbbCategoryName.setBounds(805, 533, 250, 38);
+		try {
+			String sql = "select * from product_category";
+			pst = connUtils.connect().prepareStatement(sql);
+			rs = pst.executeQuery();
+			while (rs.next()) {
+				cbbCategoryName.addItem(rs.getString("name"));
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		contentPane.add(cbbCategoryName);
 		
 		JButton btnAddSP = new JButton("Thêm");
 		btnAddSP.addActionListener(new ActionListener() {
@@ -223,13 +230,12 @@ public class ManageSP extends JFrame {
 				try {
 					MySQLConnUtils connUtils = new MySQLConnUtils();
 					String name = txtName.getText();
-					String categoryID = txtCategoryID.getText();
 					String unitprice = txtUnitprice.getText();
 					String description = txtDescription.getText();
 					String status = txtStatus.getText();
 					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 					String dCA = df.format(txtCreatedAt.getDate());
-					connUtils.insertProduct(name, categoryID, unitprice, description, status, dCA);
+					connUtils.insertProduct(name, idCategory, unitprice, description, status, dCA);
 					DefaultTableModel model = (DefaultTableModel)tableSP.getModel();
 					model.setRowCount(0);
 					loadDataSP();
@@ -253,7 +259,13 @@ public class ManageSP extends JFrame {
 					MySQLConnUtils connUtils = new MySQLConnUtils();
 					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
 					String dCA = df.format(txtCreatedAt.getDate());
-					connUtils.updateProduct(txtID.getText(), txtName.getText(), txtCategoryID.getText(), txtUnitprice.getText(), txtDescription.getText(), txtStatus.getText(), dCA);
+					String sql = "select * from product_category where name = '" + cbbCategoryName.getSelectedItem().toString() + "'";
+					pst = connUtils.connect().prepareStatement(sql);
+					rs = pst.executeQuery();
+					if (rs.next()) {
+						idCategory = rs.getString("id");
+					}
+					connUtils.updateProduct(idProduct, txtName.getText(), idCategory, txtUnitprice.getText(), txtDescription.getText(), txtStatus.getText(), dCA);
 					DefaultTableModel model = (DefaultTableModel)tableSP.getModel();
 					model.setRowCount(0);
 					loadDataSP();
@@ -275,7 +287,7 @@ public class ManageSP extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				try {
 					MySQLConnUtils connUtils = new MySQLConnUtils();
-					connUtils.deleteProduct(txtID.getText());
+					connUtils.deleteProduct(idProduct);
 					DefaultTableModel model = (DefaultTableModel)tableSP.getModel();
 					model.setRowCount(0);
 					loadDataSP();
@@ -302,21 +314,24 @@ public class ManageSP extends JFrame {
 		tableSP.getTableHeader().setFont(new Font("Segoe UI", Font.BOLD, 12));
 		tableSP.addMouseListener(new MouseAdapter() {
 			@Override
-			public void mouseClicked(MouseEvent e) {
+			public void mousePressed(MouseEvent e) {
 				try {
 					int row = tableSP.getSelectedRow();
 					String table_click = (tableSP.getModel().getValueAt(row, 0).toString());
-					String sql = "Select * from products where id = '" + table_click + "' ";
-					pst = mySQLCon.connect().prepareStatement(sql);
+					String sql = "select products.id as idProduct, products.name as nameProduct, product_category.id as idCategory, product_category.name as nameCategory, unitprice, products.description as descriptionProduct, status, products.created_at as createdAtProduct \r\n" + 
+							"from products join product_category\r\n" + 
+							"on products.category_id = product_category.id where products.id = '" + table_click + "'";
+					pst = connUtils.connect().prepareStatement(sql);
 					rs = pst.executeQuery();
 					if (rs.next()) {
-						txtID.setText(rs.getString("id"));
-						txtName.setText(rs.getString("name"));
-						txtCategoryID.setText(rs.getString("category_id"));
+						idCategory = rs.getString("idCategory");
+						idProduct = rs.getString("idProduct");
+						txtName.setText(rs.getString("nameProduct"));
+						cbbCategoryName.setSelectedItem(rs.getString("nameCategory"));
 						txtUnitprice.setText(rs.getString("unitprice"));
-						txtDescription.setText(rs.getString("description"));
+						txtDescription.setText(rs.getString("descriptionProduct"));
 						txtStatus.setText(rs.getString("status"));
-						Date dCA = new SimpleDateFormat("dd/MM/yyyy").parse(rs.getString("created_at"));
+						Date dCA = new SimpleDateFormat("dd/MM/yyyy").parse(rs.getString("createdAtProduct"));
 						txtCreatedAt.setDate(dCA);
 					}
 				} catch (Exception e1) {
@@ -326,7 +341,8 @@ public class ManageSP extends JFrame {
 		});
 		scrollPane.setViewportView(tableSP);
 		
+		
+		
 		loadDataSP();
 	}
-
 }
