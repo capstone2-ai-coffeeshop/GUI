@@ -39,6 +39,7 @@ public class ProductsQuantity extends JFrame {
 	private static ProductsQuantity obj = null;
 	public static JLabel lblTitle;
 	public static JTextField txtQuantity;
+	private JTextField txtDescription;
 
 	/**
 	 * Launch the application.
@@ -62,7 +63,7 @@ public class ProductsQuantity extends JFrame {
 	public ProductsQuantity() {
 		setTitle("S\u1ED1 l\u01B0\u1EE3ng");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(150, 150, 389, 323);
+		setBounds(150, 150, 389, 400);
 		contentPane = new JPanel();
 		contentPane.setBackground(Color.LIGHT_GRAY);
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
@@ -87,6 +88,9 @@ public class ProductsQuantity extends JFrame {
 				int bUpdate = Integer.parseInt(txtQuantity.getText());
 				Object xUpdate = (Integer)bUpdate;
 				PanelOrder.tableProductChoose.getModel().setValueAt(xUpdate, rowUpdate, 3);
+				if (!txtDescription.getText().equals("")) {
+					PanelOrder.description = txtDescription.getText();
+				}
 				double z = 0;
 				DecimalFormat formatter = new DecimalFormat("###,###,###.##");
 				for (int y = 0; y < PanelOrder.tableProductChoose.getRowCount(); y++) {
@@ -99,7 +103,7 @@ public class ProductsQuantity extends JFrame {
 		btnXacnhan.setBackground(Color.WHITE);
 		btnXacnhan.setForeground(Color.BLACK);
 		btnXacnhan.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		btnXacnhan.setBounds(12, 224, 159, 39);
+		btnXacnhan.setBounds(12, 301, 159, 39);
 		contentPane.add(btnXacnhan);
 		
 		JButton btnHuy = new JButton("H\u1EE7y");
@@ -113,7 +117,7 @@ public class ProductsQuantity extends JFrame {
 			}
 		});
 		btnHuy.setFont(new Font("Tahoma", Font.PLAIN, 20));
-		btnHuy.setBounds(200, 224, 159, 39);
+		btnHuy.setBounds(200, 301, 159, 39);
 		contentPane.add(btnHuy);
 		
 		txtQuantity = new JTextField();
@@ -154,6 +158,17 @@ public class ProductsQuantity extends JFrame {
 		lblPlus.setHorizontalAlignment(SwingConstants.CENTER);
 		lblPlus.setBounds(303, 95, 56, 50);
 		contentPane.add(lblPlus);
+		
+		txtDescription = new JTextField();
+		txtDescription.setHorizontalAlignment(SwingConstants.CENTER);
+		txtDescription.setForeground(Color.WHITE);
+		txtDescription.setFont(new Font("Tahoma", Font.PLAIN, 22));
+		txtDescription.setColumns(10);
+		txtDescription.setCaretColor(Color.WHITE);
+		txtDescription.setBorder(null);
+		txtDescription.setBackground(new Color(32, 33, 35));
+		txtDescription.setBounds(12, 193, 347, 50);
+		contentPane.add(txtDescription);
 		
 	}
 }

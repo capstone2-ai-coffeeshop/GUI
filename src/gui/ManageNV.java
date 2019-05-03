@@ -52,6 +52,9 @@ public class ManageNV extends JFrame {
 	private JTable tableNV;
 	private String idStaff;
 	private String idAccount;
+	
+	private JRadioButton rdbtnMale;
+	private JRadioButton rdbtnFemale;
 
 	/**
 	 * Launch the application.
@@ -155,7 +158,13 @@ public class ManageNV extends JFrame {
 		lblPhone.setBounds(636, 584, 157, 31);
 		contentPane.add(lblPhone);
 
-		JRadioButton rdbtnFemale = new JRadioButton("FeMale");
+		rdbtnFemale = new JRadioButton("FeMale");
+		rdbtnFemale.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent e) {
+				rdbtnMale.setSelected(false);
+			}
+		});
 		rdbtnFemale.setForeground(Color.BLACK);
 		rdbtnFemale.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		rdbtnFemale.setBackground(Color.WHITE);
@@ -181,6 +190,12 @@ public class ManageNV extends JFrame {
 		contentPane.add(txtFullname);
 		
 		JRadioButton rdbtnMale = new JRadioButton("Male");
+		rdbtnMale.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				rdbtnFemale.setSelected(false);
+			}
+		});
 		rdbtnMale.setForeground(Color.BLACK);
 		rdbtnMale.setFont(new Font("Tahoma", Font.PLAIN, 25));
 		rdbtnMale.setBackground(Color.WHITE);
@@ -191,24 +206,28 @@ public class ManageNV extends JFrame {
 		btnAddNV.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				try {
-					MySQLConnUtils connUtils = new MySQLConnUtils();
-					String fullname = txtFullname.getText();
-					String email = txtEmail.getText();
-					String gender = null;
-					if (rdbtnMale.isSelected()) {
-						gender = "1";
-					} else if (rdbtnFemale.isSelected()){
-						gender = "0";
+					if (!txtFullname.getText().equals("") && !txtEmail.getText().equals("") && !rdbtnMale.isSelected() || !rdbtnFemale.isSelected() && !txtDOB.getDate().equals("") && !txtPhone.getText().equals("")) {
+						MySQLConnUtils connUtils = new MySQLConnUtils();
+						String fullname = txtFullname.getText();
+						String email = txtEmail.getText();
+						String gender = null;
+						if (rdbtnMale.isSelected()) {
+							gender = "1";
+						} else if (rdbtnFemale.isSelected()){
+							gender = "0";
+						}
+						DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+						String dOB = df.format(txtDOB.getDate());
+						String phone = txtPhone.getText();
+						String accountID = idAccount;
+						connUtils.insertStaff(fullname, email, gender, dOB, phone, accountID);
+						DefaultTableModel model = (DefaultTableModel)tableNV.getModel();
+						model.setRowCount(0);
+						loadDataNV3();
+						JOptionPane.showMessageDialog(null, "Thêm Nhân Viên thành công!!!");
+					} else {
+						JOptionPane.showMessageDialog(null, "Nhập đầy đủ thông tin!!!");
 					}
-					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-					String dOB = df.format(txtDOB.getDate());
-					String phone = txtPhone.getText();
-					String accountID = idAccount;
-					connUtils.insertStaff(fullname, email, gender, dOB, phone, accountID);
-					DefaultTableModel model = (DefaultTableModel)tableNV.getModel();
-					model.setRowCount(0);
-					loadDataNV3();
-					JOptionPane.showMessageDialog(null, "Thêm Nhân Viên thành công!!!");
 				} catch (Exception e2) {
 					JOptionPane.showMessageDialog(null, e2);
 				}

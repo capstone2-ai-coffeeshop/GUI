@@ -59,6 +59,7 @@ public class ManageSP extends JFrame {
 	private String idProduct;
 	private String nameCategory;
 	private String idCategory;
+	private String idCategoryAdd;
 
 	/**
 	 * Launch the application.
@@ -228,18 +229,28 @@ public class ManageSP extends JFrame {
 		btnAddSP.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					MySQLConnUtils connUtils = new MySQLConnUtils();
-					String name = txtName.getText();
-					String unitprice = txtUnitprice.getText();
-					String description = txtDescription.getText();
-					String status = txtStatus.getText();
-					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-					String dCA = df.format(txtCreatedAt.getDate());
-					connUtils.insertProduct(name, idCategory, unitprice, description, status, dCA);
-					DefaultTableModel model = (DefaultTableModel)tableSP.getModel();
-					model.setRowCount(0);
-					loadDataSP();
-					JOptionPane.showMessageDialog(null, "Thêm Sản Phẩm thành công!!!");
+					if (!txtName.getText().equals("") && !txtUnitprice.getText().equals("") && !txtDescription.getText().equals("") && !txtStatus.getText().equals("") && !txtCreatedAt.getDate().equals("")) {
+						MySQLConnUtils connUtils = new MySQLConnUtils();
+						String name = txtName.getText();
+						String unitprice = txtUnitprice.getText();
+						String description = txtDescription.getText();
+						String status = txtStatus.getText();
+						DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+						String dCA = df.format(txtCreatedAt.getDate());
+						String sqlkk = "select * from product_category where name ='" + cbbCategoryName.getSelectedItem().toString() + "'";
+						pst = connUtils.connect().prepareStatement(sqlkk);
+						rs = pst.executeQuery();
+						if (rs.next()) {
+							idCategoryAdd = rs.getString("id");
+						}
+						connUtils.insertProduct(name, idCategoryAdd, unitprice, description, status, dCA);
+						DefaultTableModel model = (DefaultTableModel)tableSP.getModel();
+						model.setRowCount(0);
+						loadDataSP();
+						JOptionPane.showMessageDialog(null, "Thêm Sản Phẩm thành công!!!");
+					} else {
+						JOptionPane.showMessageDialog(null, "Nhập đầy đủ thông tin!!!");
+					}
 				} catch (Exception e2) {
 					JOptionPane.showMessageDialog(null, e2);
 				}

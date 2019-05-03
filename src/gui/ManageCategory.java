@@ -126,16 +126,20 @@ public class ManageCategory extends JFrame {
 		btnAddCategory.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					MySQLConnUtils connUtils = new MySQLConnUtils();
-					String name = txtName.getText();
-					String description = txtDescription.getText();
-					DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
-					String dCA = df.format(txtCreatedAt.getDate());
-					connUtils.insertProductCategory(name, description, dCA);
-					DefaultTableModel model = (DefaultTableModel)tableCategory.getModel();
-					model.setRowCount(0);
-					loadDataCategory();
-					JOptionPane.showMessageDialog(null, "Thêm Danh Mục Sản Phẩm thành công!!!");
+					if (!txtName.getText().equals("") && !txtDescription.getText().equals("") && !txtCreatedAt.getDate().equals("")) {
+						MySQLConnUtils connUtils = new MySQLConnUtils();
+						String name = txtName.getText();
+						String description = txtDescription.getText();
+						DateFormat df = new SimpleDateFormat("dd/MM/yyyy");
+						String dCA = df.format(txtCreatedAt.getDate());
+						connUtils.insertProductCategory(name, description, dCA);
+						DefaultTableModel model = (DefaultTableModel)tableCategory.getModel();
+						model.setRowCount(0);
+						loadDataCategory();
+						JOptionPane.showMessageDialog(null, "Thêm Danh Mục Sản Phẩm thành công!!!");
+					} else {
+						JOptionPane.showMessageDialog(null, "Nhập đầy đủ thông tin!!!");
+					}
 				} catch (Exception e2) {
 					JOptionPane.showMessageDialog(null, e2);
 				}

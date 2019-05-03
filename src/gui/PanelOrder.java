@@ -13,6 +13,8 @@ import javax.swing.border.TitledBorder;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 
+import org.json.JSONObject;
+
 import Connection.MySQLConnUtils;
 import bean.Staffs;
 import bean.Tables;
@@ -60,9 +62,13 @@ import javax.swing.ScrollPaneConstants;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.*;
 
 import javax.swing.border.EtchedBorder;
@@ -119,6 +125,8 @@ public class PanelOrder extends JPanel {
 	private DefaultTableModel model1;
 	private JTable tableBillItems;
 	private int session;
+	
+	public static String description = "No Description";
 
 	
 	public static void loadTable() {
@@ -246,9 +254,12 @@ public class PanelOrder extends JPanel {
 			if (category.getId().equals("4")) {
 				btnCategory.setIcon(new ImageIcon(PanelOrder.class.getResource("/images/food.png")));
 			}
+			if (category.getId().equals("5")) {
+				btnCategory.setIcon(new ImageIcon(PanelOrder.class.getResource("/images/orange-juice.png")));
+			}
 			btnCategory.setBackground(Color.WHITE);
 			btnCategory.setForeground(Color.BLACK);
-			btnCategory.setPreferredSize(new Dimension(140, 40));
+			btnCategory.setPreferredSize(new Dimension(160, 40));
 			btnCategory.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					try {
@@ -489,21 +500,38 @@ public class PanelOrder extends JPanel {
 				Calendar c = Calendar.getInstance();
 				int timeOfDay = c.get(Calendar.HOUR_OF_DAY);
 
-				if(timeOfDay >= 0 && timeOfDay < 11){
+				if(timeOfDay >= 0 && timeOfDay < 12){
 				    session = 1;        
-				}else if(timeOfDay >= 11 && timeOfDay < 13){
+				}else if(timeOfDay >= 12 && timeOfDay < 18){
 					session = 2;
-				}else if(timeOfDay >= 13 && timeOfDay < 18){
+				}else {
 					session = 3;
-				}else if(timeOfDay >= 18 && timeOfDay < 24){
-					session = 4;
 				}
+				///////////////////
+				String url = "http://api.openweathermap.org/data/2.5/weather?q=Danang&appid=a964e56bb5140d740392e61252739227&units=metric&cnt=6";
+				URL obj = new URL(url);
+				HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+				
+				
+				int responseCode = con.getResponseCode();
+				System.out.println("\nSending 'GET' request to URL: " + url);
+				System.out.println("Response code: " + responseCode);
+				BufferedReader in = new BufferedReader(
+						new InputStreamReader(con.getInputStream()));
+				String inputLine;
+				StringBuffer response = new StringBuffer();
+				while ((inputLine = in.readLine()) != null) {
+					response.append(inputLine);
+				}
+				in.close();
+				JSONObject myresponse = new JSONObject(response.toString());
+				///////////////////
 				for (int y = 0; y < tableProductChoose.getRowCount(); y++) {
 					String sqlK = "select * from products where name = '" + tableProductChoose.getValueAt(y, 1) + "'";
 					pst = connUtils.connect().prepareStatement(sqlK);
 					rs = pst.executeQuery();
 					if (rs.next()) {
-						connUtils.insertBillInfo(rs.getString("id"), tableProductChoose.getValueAt(y, 3).toString(), String.valueOf(session), "1", txtGiamgiaOrder.getText(), "No description");
+						connUtils.insertBillInfo(rs.getString("id"), tableProductChoose.getValueAt(y, 3).toString(), String.valueOf(session), Double.toString(myresponse.getJSONObject("main").getDouble("temp")), txtGiamgiaOrder.getText(), description);
 					}
 				}
 				Object[] columns = {"TÊN MÓN", "SỐ LƯỢNG", "ĐƠN GIÁ", "THÀNH TIỀN"};
@@ -702,6 +730,7 @@ public class PanelOrder extends JPanel {
 		btnThanhToan.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				inBill();
+				description = "No Description";
 				for( int i = model1.getRowCount() - 1; i >= 0; i-- ) {
 					model1.removeRow(i);
 			    }

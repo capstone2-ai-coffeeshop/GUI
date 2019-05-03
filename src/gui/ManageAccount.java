@@ -154,20 +154,24 @@ public class ManageAccount extends JFrame {
 		btnAddA.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				try {
-					MySQLConnUtils connUtils = new MySQLConnUtils();
-					String username = txtUsername.getText();
-					String password = txtPassword.getText();
-					String role = null;
-					if (rdbtnAdmin.isSelected()) {
-						role = "1";
-					} else if (rdbtnSaleman.isSelected()){
-						role = "0";
+					if (!txtUsername.getText().equals("") && !txtPassword.getText().equals("") && !rdbtnAdmin.isSelected() || !rdbtnSaleman.isSelected()) {
+						MySQLConnUtils connUtils = new MySQLConnUtils();
+						String username = txtUsername.getText();
+						String password = txtPassword.getText();
+						String role = null;
+						if (rdbtnAdmin.isSelected()) {
+							role = "1";
+						} else if (rdbtnSaleman.isSelected()){
+							role = "0";
+						}
+						connUtils.insertAccount(username, password, role);
+						DefaultTableModel model = (DefaultTableModel)tableA.getModel();
+						model.setRowCount(0);
+						loadDataA();
+						JOptionPane.showMessageDialog(null, "Thêm Tài Khoản thành công!!!");
+					} else {
+						JOptionPane.showMessageDialog(null, "Nhập đầy đủ thông tin!!!");
 					}
-					connUtils.insertAccount(username, password, role);
-					DefaultTableModel model = (DefaultTableModel)tableA.getModel();
-					model.setRowCount(0);
-					loadDataA();
-					JOptionPane.showMessageDialog(null, "Thêm Tài Khoản thành công!!!");
 				} catch (Exception e2) {
 					JOptionPane.showMessageDialog(null, e2);
 				}
